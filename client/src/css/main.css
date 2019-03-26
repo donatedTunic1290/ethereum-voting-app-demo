@@ -1,0 +1,86 @@
+body {
+  font-family: "Open Sans", sans-serif;
+}
+
+hr {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.addvoteButton {
+  background: #33bd9e;
+  border: 0px;
+  color: #fff;
+  border-radius: 2px;
+  padding: 10px;
+  width: 45%;
+  margin-right: 20px;
+}
+
+.removevoteButton {
+  background: #ff6d71;
+  border: 0px;
+  color: #fff;
+  border-radius: 2px;
+  padding: 10px;
+  width: 45%;
+  margin-right: 20px;
+}
+
+.resultSection {
+  background: #333333;
+  color: #fff;
+  padding-right: 5%;
+  padding-left: 5%;
+  min-height: 100vh;
+}
+
+.appSection {
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
+.votingBox {
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  padding: 20px;
+}
+
+label {
+  display: inline-block;
+  width: 100%;
+}
+
+input {
+  width: 500px;
+  padding: 5px;
+  font-size: 16px;
+}
+
+button {
+  font-size: 16px;
+  padding: 5px;
+}
+
+h2 {
+  color: #AAA;
+  font-size: 32px;
+}
+
+h3 {
+  font-weight: normal;
+  color: #AAA;
+  font-size: 24px;
+}
+
+.black {
+  color: black;
+}
+
+#balance {
+  color: black;
+}
+
+.hint {
+  color: #666;
+}
