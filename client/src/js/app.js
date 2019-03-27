@@ -119,8 +119,10 @@ let setClicks = function () {
 		const status = document.getElementById('clicks')
 		if (r) {
 			status.innerHTML = r.c[0];
+			connected();
 		} if (e) {
 			console.log(e);
+			errorConnection();
 		}
 	});
 };
@@ -152,6 +154,12 @@ let getGasCost = function (gasAmount) {
 let connected = function () {
 	let button = document.getElementById('connectToBlockchain');
 	button.innerText = 'Connected to blockchain';
+	button.setAttribute('disabled', 'true');
+};
+
+let errorConnection = function () {
+	let button = document.getElementById('connectToBlockchain');
+	button.innerText = 'Could not connect to blockchain. Check your console.';
 	button.setAttribute('disabled', 'true');
 };
 
@@ -188,8 +196,5 @@ let start = function () {
 		var contract = web3.eth.contract(abi);
 		openLab = contract.at(contractAddress);
 	}
-	
-	connected();
 	setClicks();
-	
 };
