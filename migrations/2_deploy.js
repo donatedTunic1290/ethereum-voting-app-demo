@@ -1,11 +1,11 @@
-const Openlab = artifacts.require('./Openlab.sol');
+const Voting = artifacts.require('./Voting.sol');
 
 module.exports = function(deployer, network, accounts) {
 	
 	return deployer
 			.then(() => {
 				return deployer.deploy(
-						Openlab
+						Voting
 				);
 			});
 };

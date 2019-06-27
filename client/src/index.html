@@ -2,75 +2,114 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-  <title>The Blockchain University</title>
-  
-  <!-- Bootstrap -->
-  <link href="css/bootstrap.min.css" rel="stylesheet">
-  
-  <link href="css/main.css" rel="stylesheet">
-  <link href="css/all.css" rel="stylesheet"> <!--load all fontawesome styles -->
-  
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-  <!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-  <![endif]-->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	<title>Voting Ethereum DApp</title>
+	
+	<!-- Bootstrap -->
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	
+	<link href="css/main.css" rel="stylesheet">
+	<link href="css/all.css" rel="stylesheet"> <!--load all fontawesome styles -->
+	
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
 </head>
 
 <body>
 <div class="row">
-  <div class="col-md-6 appSection">
-    <h1>Blockchain Hackathon</h1>
-    <h2>Voting App</h2>
-    <br>
-    <hr>
-    <h3><span class="black"><span id="clicks">No</span> votes</span> have been received</h3>
-    <br>
-    
-    <br>
-    <label for="ipaddress">Blockchain URL:</label>
-    <input type="text" id="ipaddress" placeholder="http://ethlabuser10.westus2.cloudapp.azure.com:8545">
-    <label for="contractAddress">Smart Contract Address:</label>
-    <input type="text" id="contractAddress" placeholder="e.g., 0x93e66d9baea28c17d9fc393b53e3fbdd76899dae">
-    
-    <br><br><button id="connectToBlockchain" onclick="start()">Connect to blockchain</button> <br> <br>
-    
-    <h3>Voting Box</h3>
-    <div class="votingBox">
-      <button class="addvoteButton" id="send" onclick="addClick()">
-        <i class="far fa-plus-square" style="font-size: 40px;"></i>
-        <br><br>
-        Add Vote
-      </button>
-      <button class="removevoteButton" id="send" onclick="removeClick()">
-        <i class="far fa-minus-square" style="font-size: 40px;"></i>
-        <br><br>
-        Remove Vote
-      </button>
-    </div>
-    <br>
-  </div>
-  <div class="col-md-6 resultSection">
-    <h3>Transaction Data</h3>
-    <br>
-    <pre id="transaction"></pre>
-    <br>
-    <br>
-    <h3>Transaction Receipt</h3>
-    <br>
-    <pre id="receipt"></pre>
-    <br>
-    <br>
-    <h3>Transaction Cost</h3>
-    <br>
-    <pre>₹<span id="cost"></span></pre>
-    <br>
-  </div>
+	<div class="col-md-6 appSection">
+		<h1>Ethereum Development</h1>
+		<h2>Voting App</h2>
+		<br>
+		<hr>
+		<br>
+		<div class="form-group">
+			<label for="connectedUser">Connected User:</label>
+			<input type="text" class="form-control" id="connectedUser" placeholder="Defaults to 2nd account in Ganache">
+			<br>
+			<label for="contractAddress">Smart Contract Address:</label>
+			<input type="text" class="form-control" id="contractAddress"
+			       placeholder="e.g., 0x93e66d9baea28c17d9fc393b53e3fbdd76899dae">
+			<br>
+			<button type="button" class="btn btn-success" id="connectToBlockchain" onclick="connectToBlockchain()">
+				Connect
+			</button>
+			<br> <br>
+		</div>
+		
+		<h3><i class="far fa fa-lock"></i> Ballot Box [
+			<span class="black">
+				<b>
+					<span id="votingStatus">...</span>
+				</b>
+			</span> ]
+			<button type="button" class="btn btn-default" id="startVotingButton" onclick="startVoting()" disabled>
+				Start Voting
+			</button>
+		</h3>
+		<div class="votingBox" id="votingBox" style="display: none;">
+			<div class="alert alert-warning" id="votingResult">
+			
+			</div>
+			<label for="receiverAddress">Voting For: </label>
+			<select id="receiverAddress" class="form-control" placeholder="Select account of whom you want to vote..">
+				<option>0xC4A34775E59552dd6aCb1932955e407A2D6a3Ce2</option>
+				<option>0x69C56D6AF8F2f2766105dbBC743D322726A28550</option>
+				<option>0x303e9B821a2E3F780675841CA227271DB978E34C</option>
+				<option>0xfC045EE07f57B71Be710Db4393150c86FD7291ce</option>
+				<option>0x308d2D82B61BBFa89582d4a3A19fD221d887CD23</option>
+			</select>
+			<br><br>
+			<button type="button" class="btn btn-success" onclick="addVote()">
+				<i class="far fa-plus-square"></i>
+				Add My Vote
+			</button>
+			<button type="button" class="btn btn-danger" id="send" onclick="removeVote()">
+				<i class="far fa-minus-square"></i>
+				Remove My Vote
+			</button>
+		</div>
+		<br>
+		<h3><i class="far fa fa-lock"></i> Result Box
+		</h3>
+		<div class="votingBox" id="resultBox" style="display: none;">
+			<div class="alert alert-warning" id="resultResult">
+			
+			</div>
+			<label for="voterAddress">Check Vote Of: </label>
+			<input type="text" class="form-control" id="voterAddress"
+			       placeholder="e.g., 0x93e66d9baea28c17d9fc393b53e3fbdd76899dae">
+			<br><br>
+			<button type="button" class="btn btn-default" onclick="getVote()">
+				<i class="far fa-check-circle"></i>
+				Check Vote
+			</button>
+		</div>
+		<br>
+	</div>
+	<div class="col-md-6 resultSection">
+		<h3>Transaction Data</h3>
+		<br>
+		<pre id="transaction"></pre>
+		<br>
+		<br>
+		<h3>Transaction Receipt</h3>
+		<br>
+		<pre id="receipt"></pre>
+		<br>
+		<br>
+		<h3>Transaction Cost</h3>
+		<br>
+		<pre>₹<span id="cost"></span></pre>
+		<br>
+	</div>
 </div>
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

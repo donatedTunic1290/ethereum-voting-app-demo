@@ -2,135 +2,235 @@ const Web3 = require('web3');
 
 let ipaddress;
 let contractAddress;
-let openLab;
+let voting;
 let web3;
+let connectedUser;
+let resultContainer = document.getElementById('votingResult');
+let resultResultContainer = document.getElementById('resultResult');
+let startVotingButton = document.getElementById('startVotingButton');
+let votingBox = document.getElementById('votingBox');
+let resultBox = document.getElementById('resultBox');
 
 const abi = [
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "totalClicks",
+		"name": "isVoting",
 		"outputs": [
 			{
 				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function",
+		"signature": "0x1bbef399"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "votes",
+		"outputs": [
+			{
+				"name": "receiver",
+				"type": "address"
+			},
+			{
+				"name": "timestamp",
 				"type": "uint256"
 			}
 		],
 		"payable": false,
 		"stateMutability": "view",
-		"type": "function"
+		"type": "function",
+		"signature": "0xd8bff5a5"
 	},
 	{
 		"inputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"constant": false,
-		"inputs": [],
-		"name": "addClick",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
+		"type": "constructor",
+		"signature": "constructor"
 	},
 	{
 		"constant": false,
 		"inputs": [],
-		"name": "removeClick",
-		"outputs": [],
+		"name": "startVoting",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
 		"payable": false,
 		"stateMutability": "nonpayable",
-		"type": "function"
+		"type": "function",
+		"signature": "0x1ec6b60a"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "stopVoting",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xfab2f86b"
 	},
 	{
 		"constant": false,
 		"inputs": [
 			{
-				"name": "_text",
-				"type": "bytes32"
+				"name": "receiver",
+				"type": "address"
 			}
 		],
-		"name": "addText",
-		"outputs": [],
+		"name": "addVote",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
 		"payable": false,
 		"stateMutability": "nonpayable",
-		"type": "function"
+		"type": "function",
+		"signature": "0x6cea0e46"
 	},
 	{
-		"constant": true,
+		"constant": false,
 		"inputs": [],
-		"name": "getText",
+		"name": "removeVote",
 		"outputs": [
 			{
 				"name": "",
-				"type": "bytes32[]"
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0x49aa4ee2"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "voterAddress",
+				"type": "address"
+			}
+		],
+		"name": "getVote",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
 			}
 		],
 		"payable": false,
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "getClicks",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
+		"type": "function",
+		"signature": "0x8d337b81"
 	}
 ];
 
-let addClick = () => {
-	openLab.addClick({ from: web3.eth.accounts[0] }, (err, res) => {
-		if (err) {
-			console.log('err ' + err);
-		} else {
-			console.log('res ' + res);
-			setClicks();
-			setStatus(res);
-		}
-	})
+let getConnectedUser = () => {
+	connectedUser = document.getElementById('connectedUser').value;
+	return connectedUser;
+};
+
+let addVote = () => {
+	let receiverAddress = document.getElementById('receiverAddress').value;
+	if (receiverAddress.length > 0) {
+		voting.addVote(receiverAddress, {from: getConnectedUser()}, (err, res) => {
+			if (err) {
+				printError(err);
+			} else {
+				console.log(res);
+				printResult(res);
+				setLogs(res);
+			}
+		});
+	} else {
+		resultContainer.innerText = 'Please mention who you want to vote for!';
+	}
 };
 
 
-let removeClick = () => {
-	openLab.removeClick({from: web3.eth.accounts[0]}, (err, res) => {
+let removeVote = () => {
+	voting.removeVote({from: getConnectedUser()}, (err, res) => {
 		if (err) {
-			console.log('err ' + err);
+			printError(err);
 		} else {
-			console.log('res ' + res);
-			setClicks();
-			setStatus(res);
-		}
-	})
-};
-
-
-let setClicks = function () {
-	openLab.getClicks.call(function (e, r) {
-		const status = document.getElementById('clicks')
-		if (r) {
-			status.innerHTML = r.c[0];
-			connected();
-		} if (e) {
-			console.log(e);
-			errorConnection();
+			console.log(res);
+			printResult(res);
+			setLogs(res);
 		}
 	});
 };
 
-let setStatus = function (transactionId) {
+let getVote = () => {
+	let voterAddress = document.getElementById('voterAddress').value;
+	voting.getVote(voterAddress, {from: getConnectedUser()}, (err, res) => {
+		if (err) {
+			resultResultContainer.innerHTML = err.toString().split(':')[2].substring(7);
+		} else {
+			console.log(res);
+			resultResultContainer.innerText = 'Voted for: ' + res;
+		}
+	});
+};
+
+let startVoting = () => {
+	console.log(startVotingButton.innerText);
+	if (startVotingButton.innerText === 'Stop Voting') {
+		voting.stopVoting({from: getConnectedUser()}, (err, res) => {
+			if (err) {
+				printError(err);
+			} else {
+				printResult(res);
+				setLogs(res);
+				checkVotingStatus();
+			}
+		});
+	} else {
+		voting.startVoting({from: getConnectedUser()}, (err, res) => {
+			if (err) {
+				printError(err);
+			} else {
+				printResult(res);
+				setLogs(res);
+				checkVotingStatus();
+			}
+		});
+	}
+};
+
+let stopVoting = () => {
+};
+
+let printError = function (error) {
+	resultContainer.innerHTML = error.toString().split(':')[2].substring(7);
+};
+
+let printResult = function (result) {
+	resultContainer.innerText = result;
+};
+
+let setLogs = function (transactionId) {
 	
 	console.log('transactionId ' + transactionId);
-	
 	
 	web3.eth.getTransaction(transactionId, function (e, r) {
 		const status = document.getElementById('transaction');
@@ -145,27 +245,52 @@ let setStatus = function (transactionId) {
 };
 
 let getGasCost = function (gasAmount) {
-	let gweiCost = 0.00000913432; //INR
+	let gweiCost = (parseInt(web3.eth.gasPrice.toString()) / 1000000000)  * 0.000021199; // Cost of 20 Gwei in INR as on 27th June 2019
 	let totalCost = gweiCost * gasAmount;
 	const status = document.getElementById('cost');
 	status.innerHTML = '' + totalCost;
 };
 
-let connected = function () {
-	let button = document.getElementById('connectToBlockchain');
-	button.innerText = 'Connected to blockchain';
-	button.setAttribute('disabled', 'true');
-};
-
 let errorConnection = function () {
 	let button = document.getElementById('connectToBlockchain');
-	button.innerText = 'Could not connect to blockchain. Check your console.';
+	button.innerText = 'Could not connect to blockchain. Check your console. Refresh page to retry.';
 	button.setAttribute('disabled', 'true');
+	votingBox.style.display = 'none';
+	startVotingButton.setAttribute('disabled', 'true');
+};
+
+let checkVotingStatus = function () {
+	voting.isVoting.call(function (err, result) {
+		const status = document.getElementById('votingStatus');
+		if (!err) {
+			if (result) {
+				status.innerHTML = 'OPEN';
+				startVotingButton.innerText = 'Stop Voting';
+			} else {
+				status.innerHTML = 'CLOSED';
+				startVotingButton.innerText = 'Start Voting';
+			}
+			connected();
+		} else {
+			console.log(err);
+			errorConnection();
+		}
+	});
+};
+
+let connected = function () {
+	let button = document.getElementById('connectToBlockchain');
+	button.innerText = 'Connected to ' + contractAddress;
+	button.setAttribute('disabled', 'true');
+	votingBox.style.display = 'block';
+	resultBox.style.display = 'block';
+	startVotingButton.disabled = false;
 };
 
 
-let start = function () {
-	ipaddress = document.getElementById('ipaddress').value;
+let connectToBlockchain = function () {
+	// ipaddress = document.getElementById('ipaddress').value;
+	ipaddress = 'http://localhost:7545';
 	contractAddress = document.getElementById('contractAddress').value;
 	
 	if (ipaddress && contractAddress) {
@@ -183,7 +308,7 @@ let start = function () {
 			window.web3 = new Web3(web3.currentProvider)
 		} else {
 			console.warn(
-					'No web3 detected. Falling back to http://127.0.0.1:9545.' +
+					'No web3 detected. Falling back to http://127.0.0.1:7545.' +
 					' You should remove this fallback when you deploy live, as it\'s inherently insecure.' +
 					' Consider switching to Metamask for development.' +
 					' More info here: http://truffleframework.com/tutorials/truffle-and-metamask'
@@ -193,8 +318,12 @@ let start = function () {
 		}
 		
 		web3 = new Web3(window.web3.currentProvider);
-		var contract = web3.eth.contract(abi);
-		openLab = contract.at(contractAddress);
+		let contract = web3.eth.contract(abi);
+		voting = contract.at(contractAddress);
+		
+		let userField = document.getElementById('connectedUser');
+		connectedUser = web3.eth.accounts[1];
+		userField.setAttribute('value', connectedUser);
 	}
-	setClicks();
+	checkVotingStatus();
 };
