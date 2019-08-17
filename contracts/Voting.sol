@@ -14,31 +14,31 @@ contract Voting is AccessControlled {
 	mapping(address => Vote) public votes;
 
 	// Define events we wish to emit
-	event AddVote(address indexed voter, address indexed receiver, uint256 timestamp);
-	event RemoveVote(address indexed voter);
+	event AddVote(address indexed voter, address receiver, uint256 timestamp);
+	event RemoveVote(address voter);
 	event StartVoting(address startedBy);
 	event StopVoting(address stoppedBy);
 
 	// Main constructor of the contract. It sets the owner of the contract and the voting status flag to false.
-	constructor() public AccessControlled(msg.sender, false) {
+	constructor() AccessControlled(msg.sender, false) public {
 		// No action required here.
 	}
 
-	function startVoting() external onlyOwner returns (bool) {
+	function startVoting() external onlyOwner returns(bool) {
 		require(!isVoting, "Voting is already OPEN.");
 		isVoting = true;
 		emit StartVoting(owner);
 		return true;
 	}
 
-	function stopVoting() external onlyOwner returns (bool) {
+	function stopVoting() external onlyOwner returns(bool) {
 		require(isVoting, "Voting is already CLOSED.");
 		isVoting = false;
 		emit StopVoting(owner);
 		return true;
 	}
 
-	function addVote(address receiver) external returns (bool) {
+	function addVote(address receiver) external onlyOwner returns(bool) {
 		assert(receiver != address(0));
 		require(isVoting, "Voting is currently not open. Please try again later.");
 		require(votes[msg.sender].timestamp == 0, "This user has already voted!");
@@ -51,7 +51,8 @@ contract Voting is AccessControlled {
 		return true;
 	}
 
-	function removeVote() external returns (bool) {
+	function removeVote() external onlyOwner returns(bool) {
+
 		require(isVoting, "Voting is currently not open. Please try again later.");
 		require(votes[msg.sender].timestamp != 0, "This user has NOT voted yet!");
 
@@ -61,8 +62,8 @@ contract Voting is AccessControlled {
 		return true;
 	}
 
-	function getVote(address voterAddress) external view onlyOwner voteClosed returns (address) {
-		assert(voterAddress != address(0));
+	function getVote(address voterAddress) external view returns(address candidateAddress) {
+		require(msg.sender == owner, "Only the contract owner can perform this operation");
 		return votes[voterAddress].receiver;
 	}
 }

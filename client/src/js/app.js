@@ -290,7 +290,7 @@ let connected = function () {
 
 let connectToBlockchain = function () {
 	// ipaddress = document.getElementById('ipaddress').value;
-	ipaddress = 'http://localhost:7545';
+	ipaddress = 'http://localhost:7546';
 	contractAddress = document.getElementById('contractAddress').value;
 	
 	if (ipaddress && contractAddress) {
@@ -322,7 +322,7 @@ let connectToBlockchain = function () {
 		voting = contract.at(contractAddress);
 		
 		let userField = document.getElementById('connectedUser');
-		connectedUser = web3.eth.accounts[1];
+		connectedUser = web3.eth.accounts[3];
 		userField.setAttribute('value', connectedUser);
 	}
 	checkVotingStatus();

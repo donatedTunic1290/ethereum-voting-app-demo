@@ -18,7 +18,7 @@ contract AccessControlled {
     }
 
     modifier voteClosed {
-        require(isVoting, "Voting is currently open. Wait for it to be closed.");
+        require(!isVoting, "Voting is currently open. Wait for it to be closed.");
         _;
     }
 
